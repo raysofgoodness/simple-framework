@@ -7,7 +7,7 @@ const vDom = {
         {
             tag: 'h1',
             props: {
-                title: 'This is title',
+                class: 'title',
             },
             children: 'Mini JavaScript Framework',
         },
@@ -36,7 +36,7 @@ const mount = (vNode, container) => {
 
     let keys = Object.keys(vNode.props);
     keys.forEach((key) => {
-       key.setAttribute(key, vNode.props[key]);
+       element.setAttribute(key, vNode.props[key]);
     });
 
     (typeof vNode.children === 'string') ? element.textContent = vNode.children :
@@ -52,10 +52,11 @@ const mount = (vNode, container) => {
 // unmount element from DOM
 const unMount = (vNode) => vNode.$element.remove();
 
-// compares nodes
+// compares nodes for changes content on page
 const patch = (firstNode, secondNode) => {
+    const tag = firstNode.tag;
 
-    if (firstNode.tag !== secondNode.tag) {
+    if (tag !== secondNode.tag) {
         mount(secondNode, firstNode.$element.parentNode);
         unMount(firstNode);
     } else {
@@ -64,21 +65,29 @@ const patch = (firstNode, secondNode) => {
         if (typeof secondNode.children === 'string') {
             secondNode.$element.textContent = secondNode.children;
         } else {
-            while (secondNode.$element.attributes.length > 0) {
-                secondNode.$element.removeAttribute(secondNode.$element.attributes[0].name)
+
+            for (let i = secondNode.$element.attributes.length - 1; i >=0; i--) {
+                secondNode.$element.removeAttribute(secondNode.$element.attributes[i].name);
             }
 
-            let keys = Object.keys(secondNode.props);
-            keys.forEach((key) => {
-                key.setAttribute(key, secondNode.props[key]);
-            });
+            for (let key in secondNode.props) {
+                secondNode.$element.setAttribute(key, secondNode.props[key]);
+            }
 
-            if (typeof firstNode.children === 'string') {
-                secondNode.$element.textContent = null;
-                secondNode.children.forEach(item => {
-                    mount(item, secondNode.$element);
-                })
+            if (firstNode.children.length !== secondNode.children.length) {
+                firstNode.children.length > secondNode.children.length
+                    ? firstNode.children.slice(secondNode.children.length).forEach(child => {
+                        unMount(child);
+                    })
+                    : secondNode.children.slice(firstNode.children.length).forEach(child => {
+                        mount(child);
+                    });
+            }
+
+            for (let i = 0; i < Math.min(firstNode.children.length, secondNode.children.length); i++) {
+                patch(firstNode.children[i], secondNode.children[i]);
             }
         }
     }
 };
+

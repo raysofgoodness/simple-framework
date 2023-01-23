@@ -3,16 +3,3 @@
     margin: 0;
     box-sizing: border-box;
 }
-
-
-.wrapper {
-    margin-top: 20%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
-.box-image {
-    margin-bottom: 40px;
-}
