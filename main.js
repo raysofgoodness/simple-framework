@@ -9,4 +9,11 @@ const nodeEl = node('div', {class: 'container mx-auto'},
 
 mount(nodeEl, document.querySelector('#app'));
 
+const state = reactive({
+    description: 'This is test description, that show reactivity',
+});
 
+
+watchEffect(() => {
+    console.log(state.description);
+});
